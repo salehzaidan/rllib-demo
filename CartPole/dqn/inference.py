@@ -1,26 +1,26 @@
 import os
 
 import gym
-from ray.rllib.algorithms.a3c import A3CConfig
+from ray.rllib.algorithms.dqn import DQNConfig
 
-CHECKPOINT_PATH = "CartPole/a3c/checkpoint/checkpoint_000010"
+CHECKPOINT_PATH = "CartPole/dqn/checkpoint/checkpoint_000010"
 ENV_NAME = "CartPole-v1"
 
 algo = (
-    A3CConfig()
+    DQNConfig()
     .environment(env=ENV_NAME)
     .framework("torch")
     .build()
     .from_checkpoint(os.path.abspath(CHECKPOINT_PATH))
 )
-env = gym.make(ENV_NAME)
+env = gym.make(ENV_NAME, render_mode="human")
 
 episode_reward = 0
 done = False
-obs = env.reset()
+obs, info = env.reset()
 while not done:
     action = algo.compute_single_action(obs)
-    obs, reward, done, info = env.step(action)
+    obs, reward, done, truncated, info = env.step(action)
     episode_reward += reward
 
     env.render()
